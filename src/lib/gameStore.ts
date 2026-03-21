@@ -1,64 +1,43 @@
-import type { SudokuGrid } from '@/types/sudoku';
-
 /**
- * A game session stored in memory on the server.
- */
-interface GameSession {
-  /** The full, solved grid (never sent to the client). */
-  solution: number[][];
-  /** Last active timestamp for memory cleanup. */
-  lastUpdate: number;
-}
-
-/**
- * In-memory game store.
- * Maps `gameId` (UUID) -> `GameSession`.
+ * KV-backed game store for Cloudflare Workers.
  *
- * NOTE: Since this is an edge/serverless environment, this Map resets
- * on cold starts. This is acceptable for a simple, free-tier deployment
- * where games are meant to be completed in one sitting.
+ * Each game session's solution is stored in Cloudflare KV
+ * keyed by its `gameId` (UUID) with a 2-hour TTL.
+ *
+ * This replaces the previous in-memory Map, which cannot
+ * persist across Worker isolates on Cloudflare.
  */
-class GameStore {
-  private store: Map<string, GameSession> = new Map();
-  // Time-to-live: 2 hours in ms
-  private ttl = 2 * 60 * 60 * 1000;
 
-  /**
-   * Saves a new game session.
-   */
-  saveGame(gameId: string, solution: number[][]): void {
-    this.store.set(gameId, {
-      solution,
-      lastUpdate: Date.now(),
-    });
-    // Trigger an async cleanup whenever a new game is created
-    this.cleanup();
-  }
+/** Time-to-live for game sessions (2 hours in seconds). */
+const SESSION_TTL_SECONDS = 2 * 60 * 60;
 
-  /**
-   * Retrieves a game solution.
-   */
-  getSolution(gameId: string): number[][] | undefined {
-    const session = this.store.get(gameId);
-    if (session) {
-      session.lastUpdate = Date.now();
-      return session.solution;
-    }
-    return undefined;
-  }
-
-  /**
-   * Removes stale games to prevent memory leaks.
-   */
-  private cleanup(): void {
-    const now = Date.now();
-    for (const [gameId, session] of this.store.entries()) {
-      if (now - session.lastUpdate > this.ttl) {
-        this.store.delete(gameId);
-      }
-    }
-  }
+/**
+ * Saves a game solution to KV.
+ *
+ * @param kv       The KV namespace binding (`env.GAME_STORE`).
+ * @param gameId   Unique game identifier (UUID).
+ * @param solution The full, solved 9×9 grid.
+ */
+export async function saveGame(
+  kv: KVNamespace,
+  gameId: string,
+  solution: number[][],
+): Promise<void> {
+  await kv.put(gameId, JSON.stringify(solution), {
+    expirationTtl: SESSION_TTL_SECONDS,
+  });
 }
 
-// Export as a singleton
-export const gameStore = new GameStore();
+/**
+ * Retrieves a game solution from KV.
+ *
+ * @param kv     The KV namespace binding (`env.GAME_STORE`).
+ * @param gameId Unique game identifier (UUID).
+ * @returns      The solved grid, or `null` if not found / expired.
+ */
+export async function getSolution(
+  kv: KVNamespace,
+  gameId: string,
+): Promise<number[][] | null> {
+  return kv.get<number[][]>(gameId, { type: 'json' });
+}

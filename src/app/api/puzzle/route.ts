@@ -1,10 +1,8 @@
 import { NextResponse } from 'next/server';
-import crypto from 'crypto';
 import { generateSolvedGrid, createPuzzle } from '@/lib/sudokuManager';
-import { gameStore } from '@/lib/gameStore';
+import { saveGame } from '@/lib/gameStore';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 import type { Difficulty, PuzzleResponse } from '@/types/sudoku';
-
-export const runtime = 'nodejs';
 
 export async function GET(request: Request) {
   // Parse difficulty from URL, default to 'medium'
@@ -25,8 +23,9 @@ export async function GET(request: Request) {
   // Generate unique game ID
   const gameId = crypto.randomUUID();
 
-  // Save full solution on server
-  gameStore.saveGame(gameId, solution);
+  // Save full solution to Cloudflare KV
+  const { env } = await getCloudflareContext();
+  await saveGame(env.GAME_STORE, gameId, solution);
 
   const responseBody: PuzzleResponse = {
     gameId,

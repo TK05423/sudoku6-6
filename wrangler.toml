@@ -1,0 +1,26 @@
+# Wrangler configuration for Cloudflare Workers deployment
+# Docs: https://developers.cloudflare.com/workers/wrangler/configuration/
+
+"$schema" = "./node_modules/wrangler/config-schema.json"
+main = ".open-next/worker.js"
+name = "sudoku-game"
+
+# Set this to today's date
+compatibility_date = "2026-03-21"
+compatibility_flags = [ "nodejs_compat" ]
+
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+# ─── Cloudflare KV Namespace ────────────────────────────────────────────────
+# Stores game solutions server-side keyed by gameId.
+#
+# CREATE YOUR NAMESPACE FIRST:
+#   npx wrangler kv namespace create GAME_STORE
+#
+# Then paste the returned "id" value below.
+# ─────────────────────────────────────────────────────────────────────────────
+[[kv_namespaces]]
+binding = "GAME_STORE"
+id = "796c9339705646168db3ce614f1df76b"

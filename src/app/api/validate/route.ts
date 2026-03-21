@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
-import { gameStore } from '@/lib/gameStore';
+import { getSolution } from '@/lib/gameStore';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 import type { ValidateRequest, ValidateResponse } from '@/types/sudoku';
-
-export const runtime = 'nodejs';
 
 export async function POST(request: Request) {
   try {
@@ -24,8 +23,9 @@ export async function POST(request: Request) {
       );
     }
 
-    // Lookup game solution
-    const solution = gameStore.getSolution(gameId);
+    // Lookup game solution from Cloudflare KV
+    const { env } = await getCloudflareContext();
+    const solution = await getSolution(env.GAME_STORE, gameId);
 
     if (!solution) {
       return NextResponse.json<ValidateResponse>(
