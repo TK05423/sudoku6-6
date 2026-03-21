@@ -102,14 +102,14 @@ export default function Home() {
       const res = await fetch('/api/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ gameId, row, col, value: num }),
+        body: JSON.stringify({ gameId, row, col, value: num, currentBoard: grid }),
       });
 
       if (!res.ok) throw new Error('Validation request failed');
 
       const data: ValidateResponse = await res.json();
 
-      if (!data.isValid) {
+      if (!data.isValid || data.isRuleViolation) {
         // Incorrect move!
         // 1. Revert the optimistically placed number
         setGrid((prev) => {
@@ -119,9 +119,11 @@ export default function Home() {
           return newGrid;
         });
 
-        // 2. Trigger penalty: +30s timer & UI flash
-        setPenaltyCount((c) => c + 1);
-        setErrorFlashKey(Date.now()); // forces re-render of flash animation
+        // 2. Trigger penalty: +30s timer & UI flash only on rule violation
+        if (data.isRuleViolation) {
+          setPenaltyCount((c) => c + 1);
+          setErrorFlashKey(Date.now()); // forces re-render of flash animation
+        }
       }
     } catch (error) {
       console.error('Validation error:', error);

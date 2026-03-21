@@ -52,12 +52,21 @@ export interface ValidateRequest {
 
   /** The number (1–9) the player entered. */
   value: number;
+
+  /** The current state of the board, used to check for rule violations. */
+  currentBoard: SudokuGrid;
 }
 
-/** Response indicating whether the player's move matches the solution. */
+/** Response indicating validation result for the player's move. */
 export interface ValidateResponse {
-  /** `true` when `value` matches `solution[row][col]`. */
+  /** `true` when the move is valid according to Sudoku rules. */
   isValid: boolean;
+
+  /** `true` if the move violates Sudoku rules (e.g., duplicate in row/col/box). */
+  isRuleViolation?: boolean;
+
+  /** `true` if the value matches the final solution. */
+  isSolutionMatch?: boolean;
 
   /** Optional error description (e.g. malformed request). */
   error?: string;
