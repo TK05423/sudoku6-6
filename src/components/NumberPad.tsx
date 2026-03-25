@@ -24,7 +24,7 @@ export function NumberPad({ onNumberClick, onErase, disabled, currentGrid }: Num
   const getDigitCount = (num: number) => {
     if (!currentGrid) return 0;
     let count = 0;
-    
+
     // 遍歷 (Traverse) 整個 9x9 盤面陣列，累加特定數字的出現次數
     for (const row of currentGrid) {
       for (const cell of row) {
@@ -51,8 +51,8 @@ export function NumberPad({ onNumberClick, onErase, disabled, currentGrid }: Num
             className={`
               relative flex flex-col items-center justify-center p-3 rounded-xl text-2xl font-semibold transition-all
               ${
-                /* 樣式邏輯：當數字填滿時，將按鈕改為灰階字體，作為直覺的視覺回饋 */
-                isComplete
+              /* 樣式邏輯：當數字填滿時，將按鈕改為灰階字體，作為直覺的視覺回饋 */
+              isComplete
                 ? 'bg-slate-100 dark:bg-slate-800 text-slate-300 dark:text-slate-600 cursor-default'
                 : 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 shadow-sm hover:shadow hover:bg-slate-50 dark:hover:bg-slate-600 active:scale-95'
               }
@@ -75,7 +75,7 @@ export function NumberPad({ onNumberClick, onErase, disabled, currentGrid }: Num
         aria-label="Erase cell"
       >
         {/* Simple erase icon (SVG) */}
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 shrink-0">
           <path d="M20 5H9l-7 7 7 7h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Z" />
           <line x1="18" y1="9" x2="12" y2="15" />
           <line x1="12" y1="9" x2="18" y2="15" />
