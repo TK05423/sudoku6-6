@@ -23,15 +23,15 @@ export async function POST(request: Request) {
     let isRuleViolation = false;
 
     // 遍歷 (Traverse) 檢查該數字所在的列 (Row) 與行 (Col) 是否已經存在相同數字
-    for (let i = 0; i < 9; i++) {
+    for (let i = 0; i < 6; i++) {
       if (i !== col && currentBoard[row][i] === value) isRuleViolation = true;
       if (i !== row && currentBoard[i][col] === value) isRuleViolation = true;
     }
 
-    // 遍歷檢查 3x3 九宮格：計算該格所屬九宮格的起始座標，並檢查九宮格內是否已有相同數字
-    const startRow = Math.floor(row / 3) * 3;
+    // 遍歷檢查 2x3 6宮格：計算該格所屬九宮格的起始座標，並檢查九宮格內是否已有相同數字
+    const startRow = Math.floor(row / 2) * 2;
     const startCol = Math.floor(col / 3) * 3;
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 2; i++) {
       for (let j = 0; j < 3; j++) {
         const r = startRow + i;
         const c = startCol + j;

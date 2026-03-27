@@ -17,7 +17,7 @@ interface NumberPadProps {
 
 // 透過解構 (Destructuring) 取出元件參數，保持程式碼乾淨易讀
 export function NumberPad({ onNumberClick, onErase, disabled, currentGrid }: NumberPadProps) {
-  const digits = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  const digits = [1, 2, 3, 4, 5, 6];
 
   // 計算特定數字在目前盤面上出現的次數。
   // 由於標準數獨的每個數字最多出現 9 次，依此判斷該數字是否已完全排滿。
@@ -39,8 +39,8 @@ export function NumberPad({ onNumberClick, onErase, disabled, currentGrid }: Num
       {/* 遍歷 1 到 9 陣列，動態產生對應的數字選取按鈕 */}
       {digits.map((num) => {
         const count = getDigitCount(num);
-        // 狀態判斷：該數字是否已在盤面上填滿 9 個
-        const isComplete = count >= 9;
+        // 狀態判斷：該數字是否已在盤面上填滿 6 個
+        const isComplete = count >= 6;
 
         return (
           <button

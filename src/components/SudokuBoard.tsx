@@ -35,16 +35,16 @@ export function SudokuBoard({
     const sameRow = r === selectedCell.row;
     const sameCol = c === selectedCell.col;
     
-    // 遍歷 (Traverse) 的視覺化：計算是否在同一個 3x3 九宮格內
+    // 遍歷 (Traverse) 的視覺化：計算是否在同一個 2x3 6宮格內
     const sameBox = 
-      Math.floor(r / 3) === Math.floor(selectedCell.row / 3) &&
+      Math.floor(r / 2) === Math.floor(selectedCell.row / 2) &&
       Math.floor(c / 3) === Math.floor(selectedCell.col / 3);
     
     return sameRow || sameCol || sameBox;
   };
 
   return (
-    <div className="w-full max-w-[450px] aspect-square mx-auto sm:p-2">
+    <div className="w-full max-w-[450px] aspect-square mx-auto">
       {/* 
         錯誤閃爍動畫的外層
         當外部因為 Validation (驗證) 發現「規則違規」時，會改變 errorFlashKey。
@@ -55,7 +55,7 @@ export function SudokuBoard({
         className={`w-full h-full bg-slate-900 border-2 sm:border-4 border-slate-800 shadow-xl overflow-hidden
           ${errorFlashKey > 0 ? 'animate-[pulse_0.4s_ease-in-out_2_alternate] border-red-500' : ''}`}
       >
-        <div className="grid grid-cols-9 grid-rows-9 h-full w-full">
+        <div className="grid grid-cols-6 grid-rows-6 h-full w-full">
           {/* 遍歷 (Traverse) 渲染 81 個格子 */}
           {grid.map((rowArr, rowIndex) =>
             rowArr.map((cellValue, colIndex) => {
@@ -69,8 +69,12 @@ export function SudokuBoard({
               // 為了凸顯 3x3 九宮格，每隔三格加粗邊框
               const borderClasses = `
                 border-slate-300 dark:border-slate-700
-                ${colIndex % 3 === 2 && colIndex !== 8 ? 'border-r-2 sm:border-r-4 border-r-slate-800 dark:border-r-slate-900' : 'border-r'}
-                ${rowIndex % 3 === 2 && rowIndex !== 8 ? 'border-b-2 sm:border-b-4 border-b-slate-800 dark:border-b-slate-900' : 'border-b'}
+                
+                /* 垂直粗線：每 3 欄加粗一次 (3, 6...)，但最後一欄 (5) 不加 */
+                ${(colIndex + 1) % 3 === 0 && colIndex !== 5 ? 'border-r-2 sm:border-r-4 border-r-slate-800' : 'border-r'}
+                
+                /* 水平粗線：每 2 列加粗一次 (2, 4...)，但最後一列 (5) 不加 */
+                ${(rowIndex + 1) % 2 === 0 && rowIndex !== 5 ? 'border-b-2 sm:border-b-4 border-b-slate-800' : 'border-b'}
               `;
 
               // ── 動態背景樣式 ─────────────────────────────────────────────

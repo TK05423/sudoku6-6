@@ -29,19 +29,20 @@ import type { SudokuGrid, Difficulty } from '@/types/sudoku';
 // ---------------------------------------------------------------------------
 
 /** Grid dimension. */
-const SIZE = 9;
+const SIZE = 6;
 
-/** Sub-box dimension (3×3). */
-const BOX = 3;
+/** Sub-box dimension (2×3). */
+const BOX_ROWS = 2;
+const BOX_COLS=3
 
 /**
  * Clue counts per difficulty level.
  * More clues → easier puzzle.
  */
 const CLUE_COUNTS: Record<Difficulty, number> = {
-  easy: 40,
-  medium: 32,
-  hard: 25,
+  easy: 18,
+  medium: 14,
+  hard:10,
 };
 
 // ---------------------------------------------------------------------------
@@ -100,11 +101,11 @@ function isValid(
     if (grid[r][col] === num) return false;
   }
 
-  // ── 3×3 box check ───────────────────────────────────────────────────
-  const boxRowStart = row - (row % BOX);
-  const boxColStart = col - (col % BOX);
-  for (let r = boxRowStart; r < boxRowStart + BOX; r++) {
-    for (let c = boxColStart; c < boxColStart + BOX; c++) {
+  // ── 2×3 box check ───────────────────────────────────────────────────
+  const boxRowStart = row - (row % BOX_ROWS);
+  const boxColStart = col - (col % BOX_COLS);
+  for (let r = boxRowStart; r < boxRowStart + BOX_ROWS; r++) {
+    for (let c = boxColStart; c < boxColStart + BOX_COLS; c++) {
       if (grid[r][c] === num) return false;
     }
   }
@@ -131,8 +132,8 @@ function solve(grid: SudokuGrid, randomise = false): boolean {
 
       // 產生候選數字陣列
       const digits = randomise
-        ? shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9])
-        : [1, 2, 3, 4, 5, 6, 7, 8, 9];
+        ? shuffle([1, 2, 3, 4, 5, 6])
+        : [1, 2, 3, 4, 5, 6];
 
       for (const num of digits) {
         if (isValid(grid, row, col, num)) {
@@ -216,16 +217,7 @@ export function generateSolvedGrid(): number[][] {
   );
 
   // ── 填滿對角線的三個 3×3 九宮格 ────────────────────────────────
-  for (let box = 0; box < SIZE; box += BOX) {
-    const digits = shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9]);
-    let idx = 0;
-    for (let r = box; r < box + BOX; r++) {
-      for (let c = box; c < box + BOX; c++) {
-        grid[r][c] = digits[idx++];
-      }
-    }
-  }
-
+  
   // ── 利用 Backtracking 將剩下未填的格子補滿 ───────────────────────────────
   solve(grid, true);
 
