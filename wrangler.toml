@@ -6,7 +6,7 @@ main = ".open-next/worker.js"
 name = "sudoku-game"
 
 # Set this to today's date
-compatibility_date = "2026-03-21"
+compatibility_date = "2026-03-27"
 compatibility_flags = [ "nodejs_compat" ]
 
 [assets]
